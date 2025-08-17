@@ -1,5 +1,5 @@
 import logging
-from src.utils import logging
+from utils.utils import logging
 import os
 
 
