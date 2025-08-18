@@ -7,7 +7,7 @@ from sentence_transformers import SentenceTransformer
 
 class LegalVectorDB:
     _client = None 
-    def __init__(self, db_path="C:/Users/rajes/assistant/Legal-Assistant-AI/database/chroma_db", model_name="all-MiniLM-L6-v2"):
+    def __init__(self, db_path="database/chroma_db", model_name="all-MiniLM-L6-v2"):
         """Initialize ChromaDB client and embedding model."""
 
         if LegalVectorDB._client is None:
