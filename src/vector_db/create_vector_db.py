@@ -2,6 +2,8 @@ import json
 import re
 from typing import Dict, Any
 import chromadb
+import logging
+from utils.logger import logging
 from sentence_transformers import SentenceTransformer
 
 
