@@ -1,17 +1,18 @@
 import logging
-from utils.logger import logging
 import os
 from PyPDF2 import PdfReader
 
-from src.utils import logging
+from src.utils.logger import logging
 
 class DataExtractionInitialise:
 	def __init__(self):
 		self.datapath = 'objects/data'
+		self.start_page = 1
+		self.end_page = -1
 
 	def read_file_names(self):
 		try:
-			self.filenames = os.listdir(self.datapath)
+			self.filenames = ["COI_2024.pdf"] #os.listdir(self.datapath)
 			return self.filenames
 		except Exception as e:
 			logging.error(f"Error occured during reading filepath. {e}")
@@ -32,7 +33,18 @@ class DataExtraction:
 		except Exception as e:
 			logging.error(f"Error occured during reading file. {e}")
 
-def main():
+
+	def filter_text(self, text):
+		formatted_text = list(text.replace('\n', ' ').strip())
+		final_text = []
+		for char in formatted_text:
+			if char.isalpha() or char.isdigit() or char == ' ':
+				final_text.append(char)
+		return final_text
+
+
+
+def Extraction():
 	data_extraction_init = DataExtractionInitialise()
 	filenames = data_extraction_init.read_file_names()
 
@@ -43,12 +55,12 @@ def main():
 		logging.info(filepath)
 
 		text = data_extraction.extract_data(filepath)
-		data.append(text)
+		data.append(''.join(data_extraction.filter_text(text)))
 	return data
 
 
 
 
 if __name__=="__main__":
-	data = main()
+	data = Extraction()
 	print(data)
