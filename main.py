@@ -1,4 +1,4 @@
-from src.vector_db import LegalVectorDB
+from src.vector_db.create_vector import LegalVectorDB
 
 
 db = LegalVectorDB()
