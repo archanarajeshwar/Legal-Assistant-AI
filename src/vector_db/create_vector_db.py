@@ -9,14 +9,19 @@ from sentence_transformers import SentenceTransformer
 
 class LegalVectorDB:
     _client = None 
-    def __init__(self, db_path="database/chroma_db", model_name="all-MiniLM-L6-v2"):
+    def __init__(self, db_path="objects/database/chroma_db", model_name="all-MiniLM-L6-v2"):
         """Initialize ChromaDB client and embedding model."""
 
         if LegalVectorDB._client is None:
             LegalVectorDB._client = chromadb.PersistentClient(path=db_path)  # init once
+            
         self.client = LegalVectorDB._client
         self.model = SentenceTransformer(model_name)
         self.collection = self.client.get_or_create_collection(name="legal_docs")
+        self.model_path = 'objects/tokenizer_model/all-MiniLM-L6-v2'
+
+    def __post_init__(self):
+        self.model.save(self.model_path)
 
     def preprocess_document(self, doc: Dict[str, Any]) -> Dict[str, str]:
         combined_text = f"Section Title : { doc['section_title']} , Section_description: {doc['section_desc']}"
