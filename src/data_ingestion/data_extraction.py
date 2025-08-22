@@ -56,9 +56,7 @@ def Extraction():
 
 		text = data_extraction.extract_data(filepath)
 		data.append(''.join(data_extraction.filter_text(text)))
-	return data
-
-
+	return data.replace('  ', ' ')
 
 
 if __name__=="__main__":
