@@ -42,7 +42,8 @@ class DataExtraction:
 				final_text.append(char)
 		return final_text
 
-
+	def filter_lang(self, text: list, language):
+		pass
 
 def Extraction():
 	data_extraction_init = DataExtractionInitialise()
@@ -54,9 +55,9 @@ def Extraction():
 		filepath = os.path.join(data_extraction_init.datapath, filename)
 		logging.info(filepath)
 
-		text = data_extraction.extract_data(filepath)
+		text = data_extraction.extract_data(filepath).replace('  ', '')
 		data.append(''.join(data_extraction.filter_text(text)))
-	return data.replace('  ', ' ')
+	return data
 
 
 if __name__=="__main__":
