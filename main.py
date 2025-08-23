@@ -1,4 +1,4 @@
-from src.data_ingestion.data_extraction import Extraction
+from src.data_ingestion.data_extraction import main
 from src.vector_db import LegalVectorDB
 
 
@@ -10,5 +10,4 @@ from src.vector_db import LegalVectorDB
 # print(results)
 
 
-data = Extraction()
-print(data)
+main()
