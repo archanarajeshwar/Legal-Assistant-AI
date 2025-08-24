@@ -9,8 +9,12 @@ db = LegalVectorDB()
 # Run a query
 query = "What is a cognizable offence?"
 results = db.query(query)
-
-print("Search Results:\n")
-for doc, meta in zip(results["documents"][0], results["metadatas"][0]):
-    print(f"Section {meta['section']} | {meta['title']}")
-    print(doc[:250], "...\n")
+reranked = db.rerank(query,results)
+#print(reranked)
+# print("Search Results:\n")
+for id , doc , meta , score in reranked:
+    print("ID:", id)
+    print("Document:", doc[:100], "...")  
+    print("Metadata:", meta)
+    print("Score:", score)
+    print("-" * 50)

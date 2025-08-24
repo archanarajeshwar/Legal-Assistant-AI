@@ -3,21 +3,25 @@ import re
 from typing import Dict, Any
 import chromadb
 import logging
-from utils.logger import logging
+#from src.utils.logger import logging
 from sentence_transformers import SentenceTransformer
+from sentence_transformers import CrossEncoder
+
 
 
 class LegalVectorDB:
     _client = None 
-    def __init__(self, db_path="database/chroma_db", model_name="all-MiniLM-L6-v2"):
+    def __init__(self, db_path="database/chroma_db", model_name="all-MiniLM-L6-v2" , cross_encoder="cross-encoder/ms-marco-MiniLM-L6-v2"):
         """Initialize ChromaDB client and embedding model."""
 
         if LegalVectorDB._client is None:
             LegalVectorDB._client = chromadb.PersistentClient(path=db_path)  # init once
         self.client = LegalVectorDB._client
         self.model = SentenceTransformer(model_name)
+        self.cross_encoder = CrossEncoder(cross_encoder)
         self.collection = self.client.get_or_create_collection(name="legal_docs")
 
+    #dynamic based on data
     def preprocess_document(self, doc: Dict[str, Any]) -> Dict[str, str]:
         combined_text = f"Section Title : { doc['section_title']} , Section_description: {doc['section_desc']}"
         combined_text = ' '.join(combined_text.split())  # normalize whitespace
@@ -48,7 +52,7 @@ class LegalVectorDB:
                 }]
             )
 
-    def query(self, query_text: str, n_results: int = 3):
+    def query(self, query_text: str, n_results: int = 7):
         """Search documents using cosine similarity."""
         clean_query = ' '.join(query_text.split())  # clean query too
         query_embedding = self.model.encode(clean_query).tolist()
@@ -59,12 +63,30 @@ class LegalVectorDB:
         )
 
         return results
+    #cross encoder to rerank results
+    def rerank(self , query_text: str , results: dict):
+        if not results or not results.get('documents') or not results['documents'][0]:
+            return []
 
+        documents = results['documents'][0]  # First batch
+        metadatas = results['metadatas'][0] if results.get('metadatas') else []
+        ids = results['ids'][0] if results.get('ids') else []
+        distances = results['distances'][0] if results.get('distances') else []
+
+        pairs = [(query_text, doc) for doc in documents]
+
+        scores = self.cross_encoder.predict(pairs)
+        reranked = sorted(
+        zip(ids, documents, metadatas, scores),
+        key=lambda x: x[3],
+        reverse=True
+    )
+        return reranked
 
 
 if __name__ == "__main__":
-    #with open("C:/Users/rajes/assistant/Legal-Assistant-AI/objects/data/crpc.json", "r", encoding="utf-8") as f:
-        #legal_data = json.load(f)
+    # with open("C:/Users/rajes/assistant/Legal-Assistant-AI/objects/data/crpc.json", "r", encoding="utf-8") as f:
+    #     legal_data = json.load(f)
 
     db = LegalVectorDB()
 
@@ -72,10 +94,10 @@ if __name__ == "__main__":
     #db.add_documents(legal_data)
 
     # Run a query
-    query = "What is a cognizable offence?"
-    results = db.query(query)
-
-    print("Search Results:\n")
-    for doc, meta in zip(results["documents"][0], results["metadatas"][0]):
-        print(f"Section {meta['section']} | {meta['title']}")
-        print(doc[:250], "...\n")
+    # query = "What is a cognizable offence?"
+    # results = db.query(query)
+    # print(results)
+    # print("Search Results:\n")
+    # for doc, meta in zip(results["documents"][0], results["metadatas"][0]):
+    #     print(f"Section {meta['section']} | {meta['title']}")
+    #     print(doc[:250], "...\n")
