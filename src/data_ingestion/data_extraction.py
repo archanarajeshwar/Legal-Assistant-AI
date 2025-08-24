@@ -71,7 +71,7 @@ def main() -> str:
 		text = data_extraction.extract_data(filepath).replace('  ', '')
 		data.append(''.join(data_extraction.filter_text(text)))
 
-	# text_data = '. '.join(data)
+	text_data = '. '.join(data)
 
 	# en_text = data_extraction.filter_lang(text=text_data,
 	# 									  language='en')
@@ -79,7 +79,7 @@ def main() -> str:
 	# hi_text = data_extraction.filter_lang(text=text_data,
 	# 									  language='hi')
 
-	# return text_data
+	return text_data
 
 
 if __name__=="__main__":
