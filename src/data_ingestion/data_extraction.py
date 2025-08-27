@@ -73,11 +73,8 @@ def main() -> str:
 
 	text_data = '. '.join(data)
 
-	# en_text = data_extraction.filter_lang(text=text_data,
-	# 									  language='en')
-
-	# hi_text = data_extraction.filter_lang(text=text_data,
-	# 									  language='hi')
+	en_text = data_extraction.filter_lang(text=text_data, language='en')
+	hi_text = data_extraction.filter_lang(text=text_data, language='hi')
 
 	return text_data
 
