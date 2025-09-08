@@ -52,7 +52,7 @@ class LegalVectorDB:
                 }]
             )
 
-    def query(self, query_text: str, n_results: int = 7):
+    def query(self, query_text: str, n_results: int = 3):
         """Search documents using cosine similarity."""
         clean_query = ' '.join(query_text.split())  # clean query too
         query_embedding = self.model.encode(clean_query).tolist()
