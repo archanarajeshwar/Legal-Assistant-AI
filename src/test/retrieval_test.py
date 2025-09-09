@@ -1,8 +1,7 @@
 from dataclasses import dataclass, field
-from vector_db.create_vector_db import LegalVectorDB
-
+from vector_db import LegalVectorDB
+import pandas
 import logging    
-import csv
 
 @dataclass
 class TestRetrieval:
@@ -11,13 +10,14 @@ class TestRetrieval:
     def test_retrieval(self, query: str):
         results = self.db.query(query)
         reranked_results = self.db.rerank(query, results)
-
-        for id, doc, meta, score in reranked_results:
-            print("ID:", id)
-            print("Document:", doc[:100], "...")  # print first 100 chars
-            print("Metadata:", meta)
-            print("Score:", score)
-            print("-" * 50)
+        logging.info(f"reranked_results: {reranked_results}")
+        return reranked_results
+        # for id, doc, meta, score in reranked_results:
+        #     print("ID:", id)
+        #     print("Document:", doc[:100], "...")  # print first 100 chars
+        #     print("Metadata:", meta)
+        #     print("Score:", score)
+        #     print("-" * 50)
 
 
 if __name__ == "__main__":
@@ -30,7 +30,7 @@ if __name__ == "__main__":
     "What is a summons case?",
     "Who is considered a police officer in this Code?",
 
-    # Procedural Queries
+    #Procedural Queries
     "How is an investigation started by police?",
     "When can a magistrate take cognizance of an offence?",
     "What is the process for issuing a summons?",
@@ -51,15 +51,33 @@ if __name__ == "__main__":
     "What is the difference between inquiry and investigation?",
     "Explain the procedure for recording confessions by magistrate."
 ]
+    all_results = []
 
-    with open("retrieval_results.csv", "w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow(["query", "id", "document_snippet", "metadata", "score"])
-        for query in test_queries:
-            reranked_results = tester.test_retrieval(query)
-            if not reranked_results:
-                writer.writerow([query, "NO_RESULTS", "", "", ""])
-                continue
+   
+    for query in test_queries:
+        reranked_results = tester.test_retrieval(query)
+        
+        if not reranked_results:
+            all_results.append({
+                "query": query,
+                "id": "NO_RESULTS",
+                "document_snippet": "",
+                "metadata": "",
+                "score": ""
+            })
+            continue
 
-            for id, doc, meta, score in reranked_results:
-                writer.writerow([query, id, doc[:100], meta, score])
+        for id, doc, meta, score in reranked_results:
+            all_results.append({
+                "query": query,
+                "id": id,
+                "document_snippet": doc[:200],  # first 200 chars
+                "metadata": meta,
+                "score": score
+            })
+    df = pandas.DataFrame(all_results)
+
+    df.to_csv("retrieval_results.csv", index=False, encoding="utf-8")
+
+#$env:PYTHONPATH="src"
+#python src\test\retrieval_test.py
